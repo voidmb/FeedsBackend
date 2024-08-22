@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using UsuarioService.Core.Contexts;
+using UsuarioService.Core.Models;
 
 public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
@@ -37,7 +38,21 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
                 var scopedServices = scope.ServiceProvider;
                 var db = scopedServices.GetRequiredService<UsuarioDBContext>();
                 db.Database.EnsureCreated(); // Crea la base de datos nuevamente
+                SeedDatabase(db);
             }
         });
+    }
+
+    private void SeedDatabase(UsuarioDBContext db)
+    {
+        // Agrega datos de prueba si no existen
+        if (!db.Usuarios.Any())
+        {
+            db.Usuarios.AddRange(
+                new Usuario { Username = "kiosko", Password = "kisoko" },
+                new Usuario { Username = "test", Password = "test" }
+            );
+            db.SaveChanges();
+        }
     }
 }
